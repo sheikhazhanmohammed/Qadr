@@ -1,39 +1,87 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import React, { createContext, useEffect, useState } from 'react';
+import { Stack } from "expo-router";
+import * as Font from 'expo-font';
+import { View, ActivityIndicator } from 'react-native';
+import { QadrColorSchema } from '../constants/colors';
+import * as Location from 'expo-location';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+// Define the location context type
+type UserLocationParameters = {
+  location: {
+    latitude: number;
+    longitude: number;
+  } | null;
+  errorMsg: string | null;
+};
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+export const UserLocationContext = createContext<UserLocationParameters>({
+  location: null,
+  errorMsg: null,
+});
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+    async function loadInitialData() {
+      try {
+        await Font.loadAsync({
+          // Add multiple fonts if needed
+          'zainBlack': require('../assets/fonts/Zain-Black.ttf'),
+          'zainBold': require('../assets/fonts/Zain-Bold.ttf'),
+          'zainExtraBold': require('../assets/fonts/Zain-ExtraBold.ttf'),
+          'zainExtraLight': require('../assets/fonts/Zain-ExtraLight.ttf'),
+          'zainItalic': require('../assets/fonts/Zain-Italic.ttf'),
+          'zainLight': require('../assets/fonts/Zain-Light.ttf'),
+          'zainLightItalic': require('../assets/fonts/Zain-LightItalic.ttf'),
+          'zainRegular': require('../assets/fonts/Zain-Regular.ttf'),
+        });
 
-  if (!loaded) {
-    return null;
+        const { status } = await Location.requestForegroundPermissionsAsync();
+
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          setIsLoading(false);
+          return;
+        }
+
+        // Get current location
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        setLocation({
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        });
+        
+        setDataLoaded(true);
+      } catch (error) {
+        console.error('Data loading error:', error);
+      }
+    }
+
+    loadInitialData();
+  }, []);
+  // Show a loading indicator while fonts are loading
+  if (!dataLoaded) {
+    return (
+      <View style={{ 
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        backgroundColor: QadrColorSchema.backgroundColor 
+      }}>
+        <ActivityIndicator size="large" color={QadrColorSchema.primaryColor1} />
+      </View>
+    );
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <UserLocationContext.Provider value={{ location, errorMsg }}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </UserLocationContext.Provider>
   );
 }
