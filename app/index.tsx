@@ -15,9 +15,10 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   return (
     <Tab.Navigator
+      initialRouteName="Home"
       screenOptions={{
-        tabBarActiveTintColor: '#2D4859',  // Darker shade for selected tab
-        tabBarInactiveTintColor: '#3D5A68', // Lighter shade for unselected tab
+        tabBarActiveTintColor: QadrColorSchema.backgroundColor,
+        tabBarInactiveTintColor: QadrColorSchema.tertiaryColor2,
         tabBarStyle: {
           backgroundColor: QadrColorSchema.secondaryColor1,
           borderTopWidth: 0,
@@ -34,7 +35,11 @@ export default function App() {
         options={{
           tabBarIcon: ({ focused }) => (
             <Image 
-              source={require('../assets/images/quran.png')} 
+            source={
+              focused 
+                ? require('../assets/images/quranFocused.png') 
+                : require('../assets/images/quranUnfocused.png')
+            } 
               style={styles.tabIcon}
             />
           ),
@@ -54,7 +59,11 @@ export default function App() {
         options={{
           tabBarIcon: ({ focused }) => (
             <Image 
-              source={require('../assets/images/home.png')} 
+            source={
+              focused 
+                ? require('../assets/images/homeFocused.png') 
+                : require('../assets/images/homeUnfocused.png')
+            } 
               style={styles.tabIcon}
             />
           ),
@@ -74,7 +83,11 @@ export default function App() {
         options={{
           tabBarIcon: ({ focused }) => (
             <Image 
-              source={require('../assets/images/dhikr.png')} 
+            source={
+              focused 
+                ? require('../assets/images/dhikrFocused.png') 
+                : require('../assets/images/dhikrUnfocused.png')
+            } 
               style={styles.tabIcon}
             />
           ),

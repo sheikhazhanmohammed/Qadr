@@ -40,6 +40,12 @@ export default function RootLayout() {
           'zainLight': require('../assets/fonts/Zain-Light.ttf'),
           'zainLightItalic': require('../assets/fonts/Zain-LightItalic.ttf'),
           'zainRegular': require('../assets/fonts/Zain-Regular.ttf'),
+          'katibehRegular': require('../assets/fonts/Katibeh-Regular.ttf'),
+          'amiriBold': require('../assets/fonts/Amiri-Bold.ttf'),
+          'amiriRegular': require('../assets/fonts/Amiri-Regular.ttf'),
+          'amiriBoldItalic': require('../assets/fonts/Amiri-BoldItalic.ttf'),
+          'amiriItalic': require('../assets/fonts/Amiri-Italic.ttf'),
+          'amiriQuran': require('../assets/fonts/AmiriQuran-Regular.ttf'),
         });
 
         const { status } = await Location.requestForegroundPermissionsAsync();
